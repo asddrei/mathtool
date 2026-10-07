@@ -66,3 +66,34 @@ except ValueError: # int("abc"), int("5.5"), int("") ---> ValueError
 if abs(a) > MAX_VALUE or abs(b) > MAX_VALUE or abs(c) > MAX_VALUE:
     print("ОШИБКА: значение вне допустимого диапазона", file=sys.stderr)
     sys.exit(1)
+
+
+
+
+
+#Блок 4
+
+
+if a == 0:
+    if b != 0:
+        print("Уравнение линейное")
+        x = -c / b
+        print(f"x = {fmt(x)}")
+    else:
+        print("ОШИБКА: это не уравнение, неизвестное отсутствует", file=sys.stderr)
+        sys.exit(1)
+else:
+    print("Уравнение квадратное")
+    d = b * b - 4 * a * c
+    print(f"D = {d}")
+    if d > 0:
+        root = math.sqrt(d)
+        x1 = (-b + root) / (2 * a)
+        x2 = (-b - root) / (2 * a)
+        print(f"x1 = {fmt(x1)}")
+        print(f"x2 = {fmt(x2)}")
+    elif d == 0:
+        x = -b / (2 * a)
+        print(f"x = {fmt(x)}")
+    else:
+        print("Действительных корней нет")
