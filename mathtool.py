@@ -57,3 +57,12 @@ try:
 except ValueError: # int("abc"), int("5.5"), int("") ---> ValueError
     print("ОШИБКА: коэффициент не является целым числом", file=sys.stderr)
     sys.exit(1)
+
+
+
+#Блок 3
+
+#Данная ситуация не является исключительной и проверяется ветвлением if, а также используется abs() -- модуль числа
+if abs(a) > MAX_VALUE or abs(b) > MAX_VALUE or abs(c) > MAX_VALUE:
+    print("ОШИБКА: значение вне допустимого диапазона", file=sys.stderr)
+    sys.exit(1)
