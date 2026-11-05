@@ -1,7 +1,8 @@
-import math #пригодится мне для квадратного корня math.sqrt()
-import sys # sys.argv (параметры), sys.exit() (код возврата), sys.stderr (поток ошибок, проверял на output.txt)
+"""Точка входа mathtool (этап 1: разбор параметров пока прежний, расчёт в calc.equation)."""
+import sys
 
-MAX_VALUE = 10000 #Значения всех коэффициентов целые, по модулю не превышающие 10 000
+from calc import equation
+
 HELP_TEXT = """mathtool — решение уравнений вида A*x^2 + B*x + C = 0
 
 Использование:
@@ -10,90 +11,69 @@ HELP_TEXT = """mathtool — решение уравнений вида A*x^2 + B
     python mathtool.py solve                   ввод коэффициентов с клавиатуры
     python mathtool.py solve -a 1 -b -3 -c 2   решение с заданными коэффициентами
 
-Коэффициенты A, B, C — целые числа, по модулю не превышающие 10000.""" #Справка, которая выведется в случае --help
-#Тройные ковычки нужны для многострочной строки
+Коэффициенты A, B, C — целые числа, по модулю не превышающие 10000."""
 
-def fmt(value): #вспомогательная функция для красивого округления и форматирования чисел, тестил в test2.py
+
+def fmt(value):
+    """Число с тремя знаками после запятой; без «-0.000»."""
     text = f"{value:.3f}"
     return "0.000" if text == "-0.000" else text
 
 
-# БЛОК 1
-
-args = sys.argv[1:] #sys.argv — список строк, введённых при запуске
+# ---------- 1. Разбор параметров командной строки (как в первой работе) ----------
+args = sys.argv[1:]
 
 if len(args) == 0 or args[0] == "--help":
     print(HELP_TEXT)
-    sys.exit(0) #выводим справку, если нету 
+    sys.exit(0)
 
-if args[0] != "solve": #если первый элемент не solve, то выдает ошибку (1)
+if args[0] != "solve":
     print(f"ОШИБКА: неизвестная команда «{args[0]}»", file=sys.stderr)
     sys.exit(1)
 
-raw_a = raw_b = raw_c = None #значений из командной строки нету
-if len(args) == 1: 
-    pass #пропускаем, значение также остаются по нулям
+raw_a = raw_b = raw_c = None
+if len(args) == 1:
+    pass
 elif len(args) == 7:
-    if args[1] != "-a" or args[3] != "-b" or args[5] != "-c": #проверяем, что именно коэффициенты a, b, c, а не никакие не z w и т.д
+    if args[1] != "-a" or args[3] != "-b" or args[5] != "-c":
         print("ОШИБКА: неизвестный параметр (ожидается: -a, -b, -c)", file=sys.stderr)
         sys.exit(1)
-    raw_a, raw_b, raw_c = args[2], args[4], args[6] #если все ок, то присваиваем им значения (будут в виде строк)
+    raw_a, raw_b, raw_c = args[2], args[4], args[6]
 else:
-    print("ОШИБКА: неверный набор параметров", file=sys.stderr) #если не 1 и не 7 параметров
+    print("ОШИБКА: неверный набор параметров", file=sys.stderr)
     sys.exit(1)
 
-
-
-#Блок 2
-
-#try/except - механизм обработки исключений (ошибок), который защищает программу от внезапного «вылета» и падения.
-try: 
-    if raw_a is None: #если ничего не задано, то просит пользователя самого ввести значения
+# ---------- 2. Получение и преобразование данных ----------
+try:
+    if raw_a is None:
         a = int(input("Введите A: "))
         b = int(input("Введите B: "))
         c = int(input("Введите C: "))
-    else: #или же значения пришли из командной строки
+    else:
         a, b, c = int(raw_a), int(raw_b), int(raw_c)
-except ValueError: # int("abc"), int("5.5"), int("") ---> ValueError
+except ValueError:
     print("ОШИБКА: коэффициент не является целым числом", file=sys.stderr)
     sys.exit(1)
 
-
-
-#Блок 3
-
-#Данная ситуация не является исключительной и проверяется ветвлением if, а также используется abs() -- модуль числа
-if abs(a) > MAX_VALUE or abs(b) > MAX_VALUE or abs(c) > MAX_VALUE:
-    print("ОШИБКА: значение вне допустимого диапазона", file=sys.stderr)
+# ---------- 3. Проверка данных и расчёт (теперь в модуле calc.equation) ----------
+try:
+    equation.check_coefficients(a, b, c)
+except ValueError as error:
+    print(f"ОШИБКА: {error}", file=sys.stderr)
     sys.exit(1)
 
+kind, d, roots = equation.solve(a, b, c)
 
-
-
-
-#Блок 4
-
-
-if a == 0:
-    if b != 0:
-        print("Уравнение линейное")
-        x = -c / b
-        print(f"x = {fmt(x)}")
-    else:
-        print("ОШИБКА: это не уравнение, неизвестное отсутствует", file=sys.stderr)
-        sys.exit(1)
-else:
-    print("Уравнение квадратное")
-    d = b * b - 4 * a * c
+# ---------- 4. Вывод результата ----------
+print(f"Уравнение {kind}")
+if d is not None:
     print(f"D = {d}")
-    if d > 0:
-        root = math.sqrt(d)
-        x1 = (-b + root) / (2 * a)
-        x2 = (-b - root) / (2 * a)
-        print(f"x1 = {fmt(x1)}")
-        print(f"x2 = {fmt(x2)}")
-    elif d == 0:
-        x = -b / (2 * a)
-        print(f"x = {fmt(x)}")
-    else:
-        print("Действительных корней нет")
+if len(roots) == 2:
+    print(f"x1 = {fmt(roots[0])}")
+    print(f"x2 = {fmt(roots[1])}")
+elif len(roots) == 1:
+    print(f"x = {fmt(roots[0])}")
+else:
+    print("Действительных корней нет")
+
+sys.exit(0)
