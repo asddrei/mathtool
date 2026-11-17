@@ -1,17 +1,8 @@
-"""Точка входа mathtool (этап 1: разбор параметров пока прежний, расчёт в calc.equation)."""
+"""Точка входа mathtool (этап 2: разбор параметров через argparse)."""
 import sys
 
+import cli
 from calc import equation
-
-HELP_TEXT = """mathtool — решение уравнений вида A*x^2 + B*x + C = 0
-
-Использование:
-    python mathtool.py                         вывод справки
-    python mathtool.py --help                  вывод справки
-    python mathtool.py solve                   ввод коэффициентов с клавиатуры
-    python mathtool.py solve -a 1 -b -3 -c 2   решение с заданными коэффициентами
-
-Коэффициенты A, B, C — целые числа, по модулю не превышающие 10000."""
 
 
 def fmt(value):
@@ -20,42 +11,36 @@ def fmt(value):
     return "0.000" if text == "-0.000" else text
 
 
-# ---------- 1. Разбор параметров командной строки (как в первой работе) ----------
-args = sys.argv[1:]
+# ---------- 1. Разбор параметров (argparse) ----------
+parser = cli.build_parser()
+args = parser.parse_args(sys.argv[1:])
 
-if len(args) == 0 or args[0] == "--help":
-    print(HELP_TEXT)
+if args.command is None:  # команда не указана: справка и код 0
+    parser.print_help()
     sys.exit(0)
 
-if args[0] != "solve":
-    print(f"ОШИБКА: неизвестная команда «{args[0]}»", file=sys.stderr)
-    sys.exit(1)
-
-raw_a = raw_b = raw_c = None
-if len(args) == 1:
-    pass
-elif len(args) == 7:
-    if args[1] != "-a" or args[3] != "-b" or args[5] != "-c":
-        print("ОШИБКА: неизвестный параметр (ожидается: -a, -b, -c)", file=sys.stderr)
-        sys.exit(1)
-    raw_a, raw_b, raw_c = args[2], args[4], args[6]
-else:
-    print("ОШИБКА: неверный набор параметров", file=sys.stderr)
+if args.command != "solve":  # остальные команды появятся на следующих этапах
+    print(f"ОШИБКА: команда {args.command} пока не реализована", file=sys.stderr)
     sys.exit(1)
 
 # ---------- 2. Получение и преобразование данных ----------
+given = [args.a is not None, args.b is not None, args.c is not None]
+if any(given) and not all(given):
+    print("ОШИБКА: укажите все три коэффициента либо ни одного", file=sys.stderr)
+    sys.exit(1)
+
 try:
-    if raw_a is None:
+    if not any(given):  # ввод с клавиатуры
         a = int(input("Введите A: "))
         b = int(input("Введите B: "))
         c = int(input("Введите C: "))
     else:
-        a, b, c = int(raw_a), int(raw_b), int(raw_c)
+        a, b, c = args.a, args.b, args.c
 except ValueError:
     print("ОШИБКА: коэффициент не является целым числом", file=sys.stderr)
     sys.exit(1)
 
-# ---------- 3. Проверка данных и расчёт (теперь в модуле calc.equation) ----------
+# ---------- 3. Проверка данных и расчёт ----------
 try:
     equation.check_coefficients(a, b, c)
 except ValueError as error:
@@ -67,7 +52,7 @@ kind, d, roots = equation.solve(a, b, c)
 # ---------- 4. Вывод результата ----------
 print(f"Уравнение {kind}")
 if d is not None:
-    print(f"D = {d}")
+    print(f"Дискриминант: {d}")
 if len(roots) == 2:
     print(f"x1 = {fmt(roots[0])}")
     print(f"x2 = {fmt(roots[1])}")
