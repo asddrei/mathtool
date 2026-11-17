@@ -2,7 +2,7 @@
 import sys
 
 import cli
-from calc import equation
+from calc import equation, stats
 
 
 def fmt(value):
@@ -45,8 +45,34 @@ def handle_solve(args):
     return 0
 
 
+def read_numbers(source):
+    """Читает числа из источника (файл или стандартный ввод)."""
+    values = []
+    for line in source:
+        for word in line.split():
+            try:
+                values.append(float(word))
+            except ValueError:
+                raise ValueError(f"{word} не является числом") from None
+    return values
+
+
+def handle_stats(args):
+    """Команда stats: возвращает код завершения."""
+    if args.input is not None:
+        with open(args.input, encoding="utf-8-sig") as handle:
+            values = read_numbers(handle)
+    else:
+        values = read_numbers(sys.stdin)
+    stats.check_values(values)
+
+    print(f"Количество: {len(values)}")
+    return 0
+
+
 HANDLERS = {
     "solve": handle_solve,
+    "stats": handle_stats,
 }
 
 
