@@ -29,7 +29,7 @@ def handle_solve(args):
         args.b = read_coefficient("B")
         args.c = read_coefficient("C")
 
-    equation.check_coefficients(args.a, args.b, args.c)
+    equation.check_coefficients({"A": args.a, "B": args.b, "C": args.c})
     kind, d, roots = equation.solve(args.a, args.b, args.c)
 
     print(f"Уравнение {kind}")

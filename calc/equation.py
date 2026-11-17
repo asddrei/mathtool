@@ -4,15 +4,15 @@ import math
 MAX_VALUE = 10000  # предельное по модулю значение коэффициентов
 
 
-def check_coefficients(a, b, c):
-    """Проверяет коэффициенты; при недопустимых данных возбуждает ValueError."""
-    if abs(a) > MAX_VALUE:
-        raise ValueError("значение вне допустимого диапазона")
-    if abs(b) > MAX_VALUE:
-        raise ValueError("значение вне допустимого диапазона")
-    if abs(c) > MAX_VALUE:
-        raise ValueError("значение вне допустимого диапазона")
-    if a == 0 and b == 0:
+def check_coefficients(coefficients):
+    """Проверяет коэффициенты; при недопустимых данных возбуждает ValueError.
+
+    coefficients -- словарь вида {"A": 1, "B": -3, "C": 2}.
+    """
+    for name, value in coefficients.items():
+        if abs(value) > MAX_VALUE:
+            raise ValueError(f"коэффициент {name} вне допустимого диапазона")
+    if coefficients["A"] == 0 and coefficients["B"] == 0:
         raise ValueError("это не уравнение, неизвестное отсутствует")
 
 
