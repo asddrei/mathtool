@@ -1,7 +1,7 @@
 """Разбор параметров командной строки (argparse)."""
 import argparse
 
-from calc import series
+from calc import integration, series
 
 
 def build_parser():
@@ -36,7 +36,8 @@ def build_parser():
     # integrate: все параметры обязательны
     integ = commands.add_parser(
         "integrate", help="численное интегрирование (левые прямоугольники)", allow_abbrev=False)
-    integ.add_argument("--func", required=True, help="какую функцию интегрировать")
+    integ.add_argument("--func", required=True, choices=sorted(integration.FUNCTIONS),
+                       help="какую функцию интегрировать")
     integ.add_argument("--from", dest="start", type=float, required=True,
                        help="нижний предел интегрирования")
     integ.add_argument("--to", dest="end", type=float, required=True,

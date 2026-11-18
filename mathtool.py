@@ -2,7 +2,7 @@
 import sys
 
 import cli
-from calc import equation, series, stats
+from calc import equation, integration, series, stats
 
 
 def fmt(value):
@@ -92,10 +92,22 @@ def handle_series(args):
     return 0
 
 
+def handle_integrate(args):
+    """Команда integrate: возвращает код завершения."""
+    integration.check_params(args.func, args.start, args.end, args.steps)
+    function, formula, _, _, _ = integration.FUNCTIONS[args.func]
+    result = integration.integrate(function, args.start, args.end, args.steps)
+
+    print(formula)
+    print(f"Значение интеграла: {result:.{series.DIGITS}f}")
+    return 0
+
+
 HANDLERS = {
     "solve": handle_solve,
     "stats": handle_stats,
         "series": handle_series,
+            "integrate": handle_integrate,
 }
 
 
@@ -106,9 +118,6 @@ def main(argv):
     if args.command is None:
         parser.print_help()
         return 0
-    if args.command not in HANDLERS:  # команды появятся на следующих этапах
-        print(f"ОШИБКА: команда {args.command} пока не реализована", file=sys.stderr)
-        return 1
     try:
         return HANDLERS[args.command](args)
     except OSError as error:
