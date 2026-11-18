@@ -66,22 +66,12 @@ def handle_stats(args):
         values = read_numbers(sys.stdin)
     stats.check_values(values)
 
-    print(f"Количество: {len(values)}")
-    print(f"Сумма: {fmt(stats.total(values))}")
-    print(f"Ср. арифм.: {fmt(stats.mean(values))}")
-    print(f"Сумма кв.: {fmt(stats.sum_squares(values))}")
-    print(f"Ср. кв.: {fmt(stats.rms(values))}")
-    print(f"Дисперсия: {fmt(stats.variance(values))}")
-    print(f"СКО: {fmt(stats.sd_population(values))}")
-    std = stats.sd_sample(values)
-    if std is None:
-        print("Станд. откл.: НЕ СУЩЕСТВУЕТ")
-    else:
-        print(f"Станд. откл.: {fmt(std)}")
-    print(f"Наименьшее: {fmt(stats.minimum(values))}")
-    print(f"Наибольшее: {fmt(stats.maximum(values))}")
-    print(f"Положительных: {stats.count_positive(values)}")
-    print(f"Отрицательных: {stats.count_negative(values)}")
+    for label, function, form in stats.REPORT:
+        value = function(values)
+        if value is None:
+            print(f"{label}: НЕ СУЩЕСТВУЕТ")
+        else:
+            print(f"{label}: {value:{form}}")
     return 0
 
 

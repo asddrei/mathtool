@@ -104,3 +104,19 @@ def count_negative(values):
         if value < 0:
             result += 1
     return result
+
+# Таблица вывода: (подпись, функция, формат). Порядок строк = порядок вывода.
+REPORT = [
+    ("Количество",     len,            "d"),
+    ("Сумма",          total,          ".3f"),
+    ("Ср. арифм.",     mean,           ".3f"),
+    ("Сумма кв.",      sum_squares,    ".3f"),
+    ("Ср. кв.",        rms,            ".3f"),
+    ("Дисперсия",      variance,       ".3f"),
+    ("СКО",            sd_population,  ".3f"),
+    ("Станд. откл.",   sd_sample,      ".3f"),
+    ("Наименьшее",     minimum,        ".3f"),
+    ("Наибольшее",     maximum,        ".3f"),
+    ("Положительных",  count_positive, "d"),
+    ("Отрицательных",  count_negative, "d"),
+]
