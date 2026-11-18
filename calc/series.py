@@ -3,6 +3,7 @@ import math
 
 MAX_TERMS = 10000       # наибольшее значение --terms
 MAX_EPS = 0.0001        # наибольшее значение --eps (самая грубая точность)
+MAX_ITERATIONS = 100000  # предел повторений цикла суммирования по точности
 DIGITS = math.ceil(-math.log10(MAX_EPS))  # знаков после запятой при выводе (4)
 
 
@@ -36,9 +37,33 @@ def check_terms(terms):
         raise ValueError(f"количество слагаемых вне диапазона 1..{MAX_TERMS}")
 
 
+def check_eps(eps):
+    """Проверяет точность; иначе ValueError."""
+    if not (math.isfinite(eps) and 0 < eps <= MAX_EPS):
+        raise ValueError(f"точность вне диапазона (больше 0 и не грубее {MAX_EPS})")
+
+
+
 def sum_by_terms(term, count):
     """Сумма первых count слагаемых; term -- функция слагаемого."""
     result = 0
     for n in range(1, count + 1):
         result += term(n)
     return result
+
+def sum_by_eps(term, eps):
+    """Суммирует, пока модуль слагаемого не станет меньше eps.
+
+    Возвращает (сумма, число слагаемых); последнее слагаемое входит в сумму.
+    При достижении MAX_ITERATIONS возбуждает ValueError.
+    """
+    result = 0
+    n = 0
+    while True:
+        n += 1
+        value = term(n)
+        result += value
+        if abs(value) < eps:
+            return result, n
+        if n >= MAX_ITERATIONS:
+            raise ValueError("точность не достигнута за допустимое число повторений")

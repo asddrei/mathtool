@@ -78,13 +78,16 @@ def handle_stats(args):
 def handle_series(args):
     """Команда series: возвращает код завершения."""
     term, formula = series.FORMULAS[args.func]
-    if args.terms is None:
-        raise ValueError("остановка по точности пока не реализована")
-    series.check_terms(args.terms)
-    result = series.sum_by_terms(term, args.terms)
+    if args.terms is not None:
+        series.check_terms(args.terms)
+        count = args.terms
+        result = series.sum_by_terms(term, count)
+    else:
+        series.check_eps(args.eps)
+        result, count = series.sum_by_eps(term, args.eps)
 
     print(formula)
-    print(f"Слагаемых: {args.terms}")
+    print(f"Слагаемых: {count}")
     print(f"Сумма ряда: {result:.{series.DIGITS}f}")
     return 0
 
