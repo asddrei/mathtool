@@ -5,12 +5,14 @@ import cli
 from calc import equation, integration, series, stats
 
 
+# ---------- вспомогательные функции ----------
 def fmt(value):
     """Число с тремя знаками после запятой; без «-0.000»."""
     text = f"{value:.3f}"
     return "0.000" if text == "-0.000" else text
 
 
+# ---------- команда solve ----------
 def read_coefficient(name):
     """Запрашивает с клавиатуры целый коэффициент."""
     try:
@@ -45,6 +47,7 @@ def handle_solve(args):
     return 0
 
 
+# ---------- команда stats ----------
 def read_numbers(source):
     """Читает числа из источника (файл или стандартный ввод)."""
     values = []
@@ -75,6 +78,7 @@ def handle_stats(args):
     return 0
 
 
+# ---------- команда series ----------
 def handle_series(args):
     """Команда series: возвращает код завершения."""
     term, formula = series.FORMULAS[args.func]
@@ -92,6 +96,7 @@ def handle_series(args):
     return 0
 
 
+# ---------- команда integrate ----------
 def handle_integrate(args):
     """Команда integrate: возвращает код завершения."""
     integration.check_params(args.func, args.start, args.end, args.steps)
@@ -128,5 +133,6 @@ def main(argv):
         return 1
 
 
+# запуск: код возврата main() становится кодом завершения программы
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1:]))
