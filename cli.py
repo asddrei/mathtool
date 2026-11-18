@@ -1,6 +1,8 @@
 """Разбор параметров командной строки (argparse)."""
 import argparse
 
+from calc import series
+
 
 def build_parser():
     """Создаёт и возвращает разборщик параметров."""
@@ -25,7 +27,8 @@ def build_parser():
 
     # series: ровно один из --terms и --eps
     ser = commands.add_parser("series", help="сумма ряда", allow_abbrev=False)
-    ser.add_argument("--func", required=True, help="какой ряд суммировать")
+    ser.add_argument("--func", required=True, choices=sorted(series.FORMULAS),
+                     help="какой ряд суммировать")
     stop = ser.add_mutually_exclusive_group(required=True)
     stop.add_argument("--terms", type=int, help="остановка по количеству слагаемых (1..10000)")
     stop.add_argument("--eps", type=float, help="остановка по точности (больше 0, не грубее 0.0001)")

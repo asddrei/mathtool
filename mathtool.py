@@ -2,7 +2,7 @@
 import sys
 
 import cli
-from calc import equation, stats
+from calc import equation, series, stats
 
 
 def fmt(value):
@@ -75,9 +75,24 @@ def handle_stats(args):
     return 0
 
 
+def handle_series(args):
+    """Команда series: возвращает код завершения."""
+    term, formula = series.FORMULAS[args.func]
+    if args.terms is None:
+        raise ValueError("остановка по точности пока не реализована")
+    series.check_terms(args.terms)
+    result = series.sum_by_terms(term, args.terms)
+
+    print(formula)
+    print(f"Слагаемых: {args.terms}")
+    print(f"Сумма ряда: {result:.{series.DIGITS}f}")
+    return 0
+
+
 HANDLERS = {
     "solve": handle_solve,
     "stats": handle_stats,
+        "series": handle_series,
 }
 
 
